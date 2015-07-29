@@ -1,0 +1,15 @@
+dn: olcDatabase={0}config,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: OPENLDAP_ROOT_PASSWORD
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: OPENLDAP_ROOT_PASSWORD
+-
+replace: olcRootDN
+olcRootDN: OPENLDAP_ROOT_DN,OPENLDAP_SUFFIX
+-
+replace: olcSuffix
+olcSuffix: OPENLDAP_SUFFIX
