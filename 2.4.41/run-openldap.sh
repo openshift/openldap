@@ -79,11 +79,24 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
             echo "slapd did not stop correctly"
             exit 1
         fi
-    else 
-        # We are not root, we have to blind-mount
+    else
+        # We are not root, we need to populate from the default blind-mount source 
+        if [ -f /opt/openshift/config/slapd.d/cn\=config/olcDatabase\=\{0\}config.ldif ]
+        then
+            # Use provided default config, get rid of current data
+            rm -rf /var/lib/ldap/*
+            rm -rf /etc/openldap/*
+            # Bring in associated default database files
+            mv -f /opt/openshift/lib/* /var/lib/ldap
+            mv -f /opt/openshift/config/* /etc/openldap
+        else
+            # Something has gone wrong with our image build
+            echo "FAILURE: Default configuration files from /contrib/ are not present in the image at /opt/oepnshift."
+            exit 1
+        fi
     fi
 
-    # Test configuration files, log checksum errors. Errors may be tolerated and repaired by slapd so don't exit
+    # Test configuration files, log hecksum errors. Errors may be tolerated and repaired by slapd so don't exit
     LOG=`slaptest 2>&1`
     CHECKSUM_ERR=$(echo "${LOG}" | grep -Po "(?<=ldif_read_file: checksum error on \").+(?=\")")
     for err in $CHECKSUM_ERR
