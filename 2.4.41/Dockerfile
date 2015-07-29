@@ -37,6 +37,7 @@ EXPOSE 389 636
 # Add defaults for config
 COPY ./contrib/config /opt/openshift
 COPY ./contrib/lib /opt/openshift
+COPY ./contrib/certs /opt/openshift
 RUN chmod -R a+rw /opt/openshift 
 
 # Add startup scripts

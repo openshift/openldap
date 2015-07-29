@@ -59,6 +59,16 @@ The following table details the possible debug levels.
 |  1024       | Log communication with shell backends         |
 |  2048       | Log etry parsing debugging                    | 
 
+You can also set the following mount points by passing the `-v /host:/container` flag to Docker.
+
+|  Volume mount point     | Description                          |
+| :---------------------- | ------------------------------------ |
+|  `/opt/openshift/certs` | OpenLDAP LDAPS certificate directory |
+
+**Notice: When mouting a directory from the host into the container, ensure that the mounted
+directory has the appropriate permissions and that the owner and group of the directory
+matches the user UID or name which is running inside the container.**
+
 Usage
 ---------------------------------
 
@@ -71,7 +81,8 @@ $ docker run -d --name openldap_server -p 389:389 -p 636:636 openshift/openldap-
 
 This will create a container named `openldap_server` running OpenLDAP with an admin
 user with credentials `cn=Manager,dc=example,dc=com:admin`. Ports 389 and 636 will be exposed and mapped
-to the host for `ldap` and `ldaps` endpoints.
+to the host for `ldap` and `ldaps` endpoints. If you want to support LDAPS, supply certs by mounting them to the Docker
+image with `-v /host/path/to/certs:/opt/openshift/certs`. You must supply `ca-bundle.crt`, `server.crt`, and `server.key`.
 
 If the configuration directory is not initialized, the entrypoint script will first
 run [`run-openldap.sh`](2.4.41/run-openldap.sh) and setup necessary directory users and passwords. 

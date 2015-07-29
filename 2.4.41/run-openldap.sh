@@ -19,6 +19,14 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
     cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
     chown ldap:ldap /var/lib/ldap/DB_CONFIG 
 
+    # Add LDAPS support if possible
+    if [ -f /opt/openshift/certs/server.key ] &&
+       [ -f /opt/openshift/certs/server.crt ] && 
+       [ -f /opt/openshift/certs/ca-bundle.crt ]
+    then
+        mv -fv /opt/openshift/certs/* /etc/openldap/certs
+    fi
+
     # start the daemon in another process and make config changes
     /usr/sbin/slapd -h "ldap:/// ldaps:/// ldapi:///" -u ldap -d $DEBUG_LEVEL &
     sleep 3
@@ -31,6 +39,17 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
         -e "s OPENLDAP_ROOT_DN ${ROOT_DN_PREFIX} g" \
         -e "s OPENLDAP_SUFFIX ${ROOT_DN_SUFFIX} g" /usr/local/etc/openldap/first_config.ldif |
         ldapmodify -Y EXTERNAL -H ldapi:/// 
+
+    # Register LDAPS certs if present
+    if [ -f /etc/openldap/certs/server.key ] &&
+       [ -f /etc/openldap/certs/server.crt ] && 
+       [ -f /etc/openldap/certs/ca-bundle.crt ]
+    then
+        ldapmodify -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/ldaps_init.ldif
+        # Update sysconfig for ldaps
+        sed -i 's|^SLAPD_URLS*+$|SLAPD_URLS="ldapi:/// ldap:/// ldaps:///"|g' /etc/sysconfig/slapd
+        echo "TLS_REQCERT allow" >> /etc/openldap/ldap.conf 
+    fi 
 
     # add useful schemas
     ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
