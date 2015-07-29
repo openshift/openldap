@@ -1,0 +1,6 @@
+dn: OPENLDAP_SUFFIX
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+dc: FIRST_PART
+o: FIRST_PART
