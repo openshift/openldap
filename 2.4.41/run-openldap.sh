@@ -48,6 +48,9 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
             -e "s OPENLDAP_SUFFIX ${OPENLDAP_ROOT_DN_SUFFIX} g" /usr/local/etc/openldap/first_config.ldif |
             ldapmodify -Y EXTERNAL -H ldapi:/// -d $OPENLDAP_DEBUG_LEVEL
 
+        # add test schema
+        ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/testPerson.ldif -d $OPENLDAP_DEBUG_LEVEL
+
         # add useful schemas
         ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif -d $OPENLDAP_DEBUG_LEVEL
         ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif -d $OPENLDAP_DEBUG_LEVEL
