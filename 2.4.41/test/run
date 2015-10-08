@@ -6,7 +6,7 @@
 # The image has to be available before this script is executed.
 #
 
-set -exo nounset
+set -eo nounset
 shopt -s nullglob
 
 IMAGE_NAME=${IMAGE_NAME:-openshift/openldap-2441-centos7-candidate}
@@ -42,11 +42,6 @@ function get_container_ip() {
   docker inspect --format='{{.NetworkSettings.IPAddress}}' $(get_cid "$id")
 }
 
-function openldap_cmd() {
-  url_encoded_base=dc%3Dexample%2Cdc%3Dcom #dc=example,dc=com
-  curl "ldap://${CONTAINER_IP}:389/${url_encoded_base}?$@"
-}
-
 function test_connection() {
   local name=$1
   ip=$(get_container_ip $name)
@@ -56,7 +51,7 @@ function test_connection() {
   for i in $(seq $max_attempts); do
     echo "    Trying to connect..."
     set +e
-    openldap_cmd "objectClass%3D*" #objectClass=*
+    ldapsearch -x -h ${CONTAINER_IP} -p 389 -b dc=example,dc=com objectClass=*
     status=$?
     set -e
     if [ $status -eq 0 ]; then
@@ -72,7 +67,9 @@ function test_connection() {
 
 function test_openldap() {
   echo "  Testing OpenLDAP"
-  openldap_cmd "objectClass%3Dorganization" | grep -E "dc=example,dc=com" #objectClass=organization
+  ldapsearch -x -LLL -h ${CONTAINER_IP} -p 389 -b dc=example,dc=com objectClass=organization | grep "dc=example,dc=com"
+  ldapadd -x -h ${CONTAINER_IP} -p 389 -D cn=Manager,dc=example,dc=com -w admin -f test/test.ldif  
+  ldapsearch -x -LLL -h ${CONTAINER_IP} -p 389 -b cn=person,dc=example,dc=com memberof | grep "memberOf: cn=group"
   echo "  Success!"
 }
 
