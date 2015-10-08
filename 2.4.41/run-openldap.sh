@@ -59,10 +59,10 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
         ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/load_modules.ldif -d $OPENLDAP_DEBUG_LEVEL
         
         # configure memberOf module
-        ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/memberof_configure.ldif -d $OPENLDAP_DEBUG_LEVEL
+        ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/configure_memberof.ldif -d $OPENLDAP_DEBUG_LEVEL
 
         # configure refint module
-        ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/refint_configure.ldif -d $OPENLDAP_DEBUG_LEVEL
+        ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/configure_refint.ldif -d $OPENLDAP_DEBUG_LEVEL
 
         # extract dc name from root DN suffix
         dc_name=$(echo "${OPENLDAP_ROOT_DN_SUFFIX}" | grep -Po "(?<=^dc\=)[\w\d]+")
