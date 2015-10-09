@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
-# CRC32 6da59458
+# CRC32 2d55e8ea
 dn: cn=config
 objectClass: olcGlobal
 cn: config
@@ -9,9 +9,9 @@ olcTLSCACertificatePath: /etc/openldap/certs
 olcTLSCertificateFile: "OpenLDAP Server"
 olcTLSCertificateKeyFile: /etc/openldap/certs/password
 structuralObjectClass: olcGlobal
-entryUUID: 240faa1a-00b4-1035-9776-139889fb25da
+entryUUID: 1752bf5a-022c-1035-8b1b-150b514cd1c2
 creatorsName: cn=config
-createTimestamp: 20151006202533Z
-entryCSN: 20151006202533.978409Z#000000#000#000000
+createTimestamp: 20151008171643Z
+entryCSN: 20151008171643.377992Z#000000#000#000000
 modifiersName: cn=config
-modifyTimestamp: 20151006202533Z
+modifyTimestamp: 20151008171643Z

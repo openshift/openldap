@@ -23,6 +23,7 @@ COPY ./contrib/lib /opt/openshift/lib
 # Add startup scripts
 COPY run-*.sh /usr/local/bin/
 COPY contrib/*.ldif /usr/local/etc/openldap/
+COPY contrib/*.schema /usr/local/etc/openldap/
 COPY contrib/DB_CONFIG /usr/local/etc/openldap/
 
 # Install OpenLDAP Server, give it permissionst to bind to low ports
