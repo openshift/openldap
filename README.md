@@ -3,13 +3,15 @@ OpenLDAP for OpenShift - Docker images
 DISCLAIMER - IMAGES ONLY FOR INTERNAL TESTING OF ORIGIN REPOSITORY
 ==================================================================
 
+[![Build Status](https://ci.openshift.redhat.com/jenkins/buildStatus/icon?job=openldap)](https://ci.openshift.redhat.com/jenkins/job/openldap/)
+
 This repository contains Dockerfiles for OpenLDAP images for OpenShift testing.
 Images are based on CentOS. Images are **NOT** meant to be used for LDAP servers in
 any environment other than the OpenShift Origin test environment at this time. No
 guarantees are given for the efficacy or stability of images in this repository or
 those created with Dockerfiles from this repository.
 
-If you are working on developing this image, refer to [the hacking document](HACKING.md) 
+If you are working on developing this image, refer to [the hacking document](HACKING.md)
 for detailed discussion of deploying OpenLDAP as a Docker container under OpenShift.
 
 
@@ -62,7 +64,7 @@ The following table details the possible debug levels.
 |  256        | Stats log connections, operations and results |
 |  512        | Stats log entries sent                        |
 |  1024       | Log communication with shell backends         |
-|  2048       | Log entry parsing debugging                   | 
+|  2048       | Log entry parsing debugging                   |
 
 You can also set the following mount points by passing the `-v /host:/container` flag to Docker.
 
@@ -87,15 +89,15 @@ $ docker run -d --name openldap_server -p 389:389 -p 636:636 openshift/openldap-
 
 This will create a container named `openldap_server` running OpenLDAP with an admin
 user with credentials `cn=Manager,dc=example,dc=com:admin`. Ports 389 and 636 will be exposed and mapped
-to the host for `ldap` and `ldaps` endpoints, respectively. If you want your directory to be persistent 
+to the host for `ldap` and `ldaps` endpoints, respectively. If you want your directory to be persistent
 across container executions, also add a `-v /host/data/path:/var/lib/ldap` argument to specify
 the OpenLDAP data files, and a `-v /host/config/path:/etc/openshift` argument to specify OpenLDAP
 configuration files. Ensure that a file named `CONFIGURED` exists in the directory you are mounting to `/etc/openldap`
 so that the startup scripts do not try to re-configure slapd.
 
 If the configuration directory is not initialized, the entrypoint script will first
-run [`run-openldap.sh`](2.4.41/run-openldap.sh) and setup necessary directory users and passwords. 
-After the database is initialized, or if it was already present, `slapd` is executed and will run 
+run [`run-openldap.sh`](2.4.41/run-openldap.sh) and setup necessary directory users and passwords.
+After the database is initialized, or if it was already present, `slapd` is executed and will run
 as PID 1. You can stop the detached container by running `docker stop openldap_server`.
 
 Test
