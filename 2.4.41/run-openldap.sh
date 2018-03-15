@@ -90,7 +90,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
             exit 1
         fi
     else
-        # We are not root, we need to populate from the default blind-mount source 
+        # We are not root, we need to populate from the default bind-mount source 
         if [ -f /opt/openshift/config/slapd.d/cn\=config/olcDatabase\=\{0\}config.ldif ]
         then
             # Use provided default config, get rid of current data
@@ -101,7 +101,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
             mv -f /opt/openshift/config/* /etc/openldap
         else
             # Something has gone wrong with our image build
-            echo "FAILURE: Default configuration files from /contrib/ are not present in the image at /opt/oepnshift."
+            echo "FAILURE: Default configuration files from /contrib/ are not present in the image at /opt/openshift."
             exit 1
         fi
     fi
