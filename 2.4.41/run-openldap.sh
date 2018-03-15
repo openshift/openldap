@@ -101,7 +101,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
             mv -f /opt/openshift/config/* /etc/openldap
         else
             # Something has gone wrong with our image build
-            echo "FAILURE: Default configuration files from /contrib/ are not present in the image at /opt/oepnshift."
+            echo "FAILURE: Default configuration files from /contrib/ are not present in the image at /opt/openshift."
             exit 1
         fi
     fi
