@@ -52,6 +52,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
         # add useful schemas
         ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif -d $OPENLDAP_DEBUG_LEVEL
         ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif -d $OPENLDAP_DEBUG_LEVEL
+        ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif -d $OPENLDAP_DEBUG_LEVEL
 
         # load memberOf and refint modules
         ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/load_modules.ldif -d $OPENLDAP_DEBUG_LEVEL
