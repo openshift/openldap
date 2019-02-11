@@ -6,7 +6,7 @@
 ulimit -n 1024
 
 OPENLDAP_ROOT_PASSWORD=${OPENLDAP_ROOT_PASSWORD:-admin}
-OPENLDAP_ROOT_DN_RREFIX=${OPENLDAP_ROOT_DN_RREFIX:-'cn=Manager'}
+OPENLDAP_ROOT_DN_PREFIX=${OPENLDAP_ROOT_DN_PREFIX:-'cn=Manager'}
 OPENLDAP_ROOT_DN_SUFFIX=${OPENLDAP_ROOT_DN_SUFFIX:-'dc=example,dc=com'}
 OPENLDAP_DEBUG_LEVEL=${OPENLDAP_DEBUG_LEVEL:-256}
 
@@ -42,7 +42,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
 
         # Update configuration with root password, root DN, and root suffix
         sed -e "s OPENLDAP_ROOT_PASSWORD ${OPENLDAP_ROOT_PASSWORD_HASH} g" \
-            -e "s OPENLDAP_ROOT_DN ${OPENLDAP_ROOT_DN_RREFIX} g" \
+            -e "s OPENLDAP_ROOT_DN ${OPENLDAP_ROOT_DN_PREFIX} g" \
             -e "s OPENLDAP_SUFFIX ${OPENLDAP_ROOT_DN_SUFFIX} g" /usr/local/etc/openldap/first_config.ldif |
             ldapmodify -Y EXTERNAL -H ldapi:/// -d $OPENLDAP_DEBUG_LEVEL
 
@@ -55,7 +55,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
 
         # load memberOf and refint modules
         ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/load_modules.ldif -d $OPENLDAP_DEBUG_LEVEL
-        
+
         # configure memberOf module
         ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/configure_memberof.ldif -d $OPENLDAP_DEBUG_LEVEL
 
@@ -68,12 +68,12 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
         sed -e "s OPENLDAP_SUFFIX ${OPENLDAP_ROOT_DN_SUFFIX} g" \
             -e "s FIRST_PART ${dc_name} g" \
             usr/local/etc/openldap/base.ldif |
-            ldapadd -x -D "$OPENLDAP_ROOT_DN_RREFIX,$OPENLDAP_ROOT_DN_SUFFIX" -w "$OPENLDAP_ROOT_PASSWORD"
+            ldapadd -x -D "$OPENLDAP_ROOT_DN_PREFIX,$OPENLDAP_ROOT_DN_SUFFIX" -w "$OPENLDAP_ROOT_PASSWORD"
 
         # stop the daemon
         pid=$(ps -A | grep slapd | awk '{print $1}')
         kill -2 $pid || echo $?
-        
+
         # ensure the daemon stopped
         for ((i=30; i>0; i--))
         do
@@ -90,7 +90,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
             exit 1
         fi
     else
-        # We are not root, we need to populate from the default bind-mount source 
+        # We are not root, we need to populate from the default bind-mount source
         if [ -f /opt/openshift/config/slapd.d/cn\=config/olcDatabase\=\{0\}config.ldif ]
         then
             # Use provided default config, get rid of current data
