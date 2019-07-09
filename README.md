@@ -1,7 +1,7 @@
 OpenLDAP for OpenShift - Docker images
 ========================================
-DISCLAIMER - IMAGES ONLY FOR INTERNAL TESTING OF ORIGIN REPOSITORY
-==================================================================
+
+***DISCLAIMER - IMAGES ONLY FOR INTERNAL TESTING OF ORIGIN REPOSITORY***
 
 This repository contains Dockerfiles for OpenLDAP images for OpenShift testing.
 Images are based on CentOS. Images are **NOT** meant to be used for LDAP servers in
@@ -16,10 +16,10 @@ for detailed discussion of deploying OpenLDAP as a Docker container under OpenSh
 Versions
 ---------------
 OpenLDAP versions currently provided are:
-* openldap-2.4.41
+* ***openldap-2.4.41***
 
 CentOS versions currently supported are:
-* CentOS7
+* ***CentOS 7***
 
 
 Installation
