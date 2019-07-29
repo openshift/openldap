@@ -1,14 +1,18 @@
 SKIP_SQUASH?=0
-VERSIONS="2.4.41"
+VERSIONS="2.4.41 2.4.46"
 
 ifeq ($(TARGET),rhel7)
 	OS := rhel7
+else ifeq ($(TARGET),fed29)
+	OS := fed29
 else
 	OS := centos7
 endif
 
 ifeq ($(VERSION), 2.4.41)
 	VERSION := 2.4.41
+else ifeq ($(VERSION), 2.4.46)
+	VERSION := 2.4.46
 else
 	VERSION :=
 endif
