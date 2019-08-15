@@ -38,12 +38,13 @@ Environment variables and volumes
 The image recognizes the following environment variables that you can set during
 initialization by passing `-e VAR=VALUE` to the Docker `run` command.
 
-|    Variable name           |    Description                            | Default                   |
+| Variable name              | Description                               | Default                   |
 | :------------------------- | ----------------------------------------- | ------------------------- |
-|  `OPENLDAP_ROOT_PASSWORD`  | OpenLDAP `olcRootPW` password             | `admin`                   |
-|  `OPENLDAP_ROOT_DN_SUFFIX` | OpenLDAP `olcSuffix` suffix               | `dc=example,dc=com`       |
-|  `OPENLDAP_ROOT_DN_PREFIX` | OpenLDAP `olcRootDN` prefix               | `cn=Manager`              |
-|  `OPENLDAP_DEBUG_LEVEL`    | OpenLDAP Server Debug Level               | `256`                     |
+| `OPENLDAP_ROOT_PASSWORD`   | OpenLDAP `olcRootPW` password             | `admin`                   |
+| `OPENLDAP_ROOT_DN_SUFFIX`  | OpenLDAP `olcSuffix` suffix               | `dc=example,dc=com`       |
+| `OPENLDAP_ROOT_DN_PREFIX`  | OpenLDAP `olcRootDN` prefix               | `cn=Manager`              |
+| `OPENLDAP_DEBUG_LEVEL`     | OpenLDAP Server Debug Level               | `256`                     |
+| `OPENLDAP_LISTEN_URIS`     | OpenLDAP Server Listen URIs               | `ldaps:/// ldap:///`      |
 
 The following table details the possible debug levels.
 
