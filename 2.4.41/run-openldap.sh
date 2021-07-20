@@ -62,6 +62,9 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
 
         # configure refint module
         ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/configure_refint.ldif -d $OPENLDAP_DEBUG_LEVEL
+	
+	# configure monitoring
+        ldapadd -Y EXTERNAL -H ldapi:/// -f /usr/local/etc/openldap/configure_monitoring.ldif -d $OPENLDAP_DEBUG_LEVEL
 
         # extract dc name from root DN suffix
         dc_name=$(echo "${OPENLDAP_ROOT_DN_SUFFIX}" | grep -Po "(?<=^dc\=)[\w\d]+")
