@@ -9,13 +9,12 @@ FROM centos:centos7
 # * $OPENLDAP_ADMIN_PASSWORD         - OpenLDAP administrator password
 # * $OPENLDAP_DEBUG_LEVEL (Optional) - OpenLDAP debugging level, defaults to 256
 
-MAINTAINER Steve Kuznetsov <skuznets@redhat.com>
-
 LABEL io.k8s.description="OpenLDAP is an open source implementation of the Lightweight Directory Access Protocol." \
       io.k8s.display-name="OpenLDAP 2.4.41" \
       io.openshift.expose-services="389:ldap,636:ldaps" \
       io.openshift.tags="directory,ldap,openldap,openldap2441" \
-      io.openshift.non-scalable="true"
+      io.openshift.non-scalable="true" \
+      io.openshift.maintainer="Steve Kuznetsov <skuznets@redhat.com>"
 
 # Add defaults for config
 COPY ./contrib/config /opt/openshift/config
@@ -36,7 +35,7 @@ RUN yum install -y openldap openldap-servers openldap-clients && \
     chmod a+rwx -R /etc/openldap && \
     mkdir -p /var/run/openldap && \
     chmod a+rwx -R /var/run/openldap && \
-    chmod -R a+rw /opt/openshift 
+    chmod -R a+rw /opt/openshift
 
 # Set OpenLDAP data and config directories in a data volume
 VOLUME ["/var/lib/ldap", "/etc/openldap"]
