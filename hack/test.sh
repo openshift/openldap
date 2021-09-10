@@ -9,28 +9,29 @@
 set -eo nounset
 shopt -s nullglob
 
-IMAGE_NAME=${IMAGE_NAME:-openshift/openldap-2441-centos7-candidate}
+IMAGE_NAME=${IMAGE_NAME:-openshift/openldap-candidate}
 
 CIDFILE_DIR=$(mktemp --suffix=openldap_test_cidfiles -d)
 
 function cleanup() {
   for cidfile in $CIDFILE_DIR/* ; do
     CONTAINER=$(cat $cidfile)
-
     echo "Stopping and removing container $CONTAINER..."
     docker stop $CONTAINER
     exit_status=$(docker inspect -f '{{.State.ExitCode}}' $CONTAINER)
+
     if [ "$exit_status" != "0" ]; then
       echo "Dumping logs for $CONTAINER"
       docker logs $CONTAINER
     fi
+
     docker rm $CONTAINER
     rm $cidfile
+
     echo "Done."
   done
   rmdir $CIDFILE_DIR
 }
-trap cleanup EXIT SIGINT
 
 function get_cid() {
   local id="$1" ; shift || return 1
@@ -44,52 +45,67 @@ function get_container_ip() {
 
 function test_connection() {
   local name=$1
-  ip=$(get_container_ip $name)
-  echo "  Testing OpenLDAP connection to $ip..."
   local max_attempts=20
   local sleep_time=2
+
+  ip=$(get_container_ip $name)
+  echo "  Testing OpenLDAP connection to $ip..."
+
   for i in $(seq $max_attempts); do
     echo "    Trying to connect..."
+  
     set +e
     ldapsearch -x -h ${CONTAINER_IP} -p 389 -b dc=example,dc=com objectClass=*
     status=$?
     set -e
+  
     if [ $status -eq 0 ]; then
       echo "  Success!"
       return 0
     fi
+  
     sleep $sleep_time
   done
+
   echo "  Giving up: Failed to connect. Logs:"
   docker logs $(get_cid $name)
+
   return 1
 }
 
 function test_openldap() {
   echo "  Testing OpenLDAP"
+
   ldapsearch -x -LLL -h ${CONTAINER_IP} -p 389 -b dc=example,dc=com objectClass=organization | grep "dc=example,dc=com"
   ldapadd -x -h ${CONTAINER_IP} -p 389 -D cn=Manager,dc=example,dc=com -w admin -f test/test.ldif  
   ldapsearch -x -LLL -h ${CONTAINER_IP} -p 389 -b cn=person,dc=example,dc=com memberof | grep "dc=example,dc=com"
+
   echo "  Success!"
 }
 
 function create_container() {
   local name=$1
+
   cidfile="$CIDFILE_DIR/$name"
   # create container with a cidfile in a directory for cleanup
   docker run ${DOCKER_ARGS:-} --cidfile $cidfile -d $IMAGE_NAME ${CONTAINER_ARGS:-}
+
   echo "Created container $(cat $cidfile)"
 }
 
 
 function run_tests() {
   local name=$1
+
   create_container $name
   CONTAINER_IP=$(get_container_ip $name)
   test_connection $name
   test_openldap $name
+
   echo "  Test Success!"
 }
+
+trap cleanup EXIT SIGINT
 
 # Tests.
 run_tests test_container_root
