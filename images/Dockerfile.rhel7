@@ -1,9 +1,8 @@
-# Current LOWEST version is 2.4.57.
+# Current LOWEST version for RHEL7 is 2.4.44.
 # Version could be patched by OS.
-ARG VERSION=2.4.57
-ARG OS=fedora:34
+ARG VERSION=2.4.44
 
-FROM "${OS}"
+FROM registry.access.redhat.com/ubi7/ubi
 
 # OpenLDAP server image for OpenShift Origin
 #
@@ -15,9 +14,9 @@ FROM "${OS}"
 # * $OPENLDAP_DEBUG_LEVEL (Optional) - OpenLDAP debugging level, defaults to 256
 
 LABEL io.k8s.description="OpenLDAP is an open source implementation of the Lightweight Directory Access Protocol." \
-      io.k8s.display-name="OpenLDAP 2.4.46" \
+      io.k8s.display-name="OpenLDAP ${VERSION}" \
       io.openshift.expose-services="389:ldap,636:ldaps" \
-      io.openshift.tags="directory,ldap,openldap,openldap2446" \
+      io.openshift.tags="directory,ldap,openldap" \
       io.openshift.non-scalable="true" \
       io.openshift.maintainer="Krzysztof Ostrowski <kostrows@redhat.com>"
 

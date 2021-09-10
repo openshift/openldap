@@ -1,32 +1,31 @@
 OPENLDAP_VERSION := $(shell git describe --tags --always --dirty)
-DOCKER_REGISTRY := dockerhub.com
-DOCKER_IMAGE_NAME := openshift/openldap
-DOCKER_IMAGE := $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME)
-TIMESTAMP_RFC3339 := $(shell date +%Y-%m-%dT%T%z)
+
+RUNTIME ?= podman
+CONTAINER_REGISTRY := dockerhub.com/
+IMAGE_NAME := openshift/openldap
+IMAGE_PATH := $(CONTAINER_REGISTRY)$(IMAGE_NAME)
 
 ifeq ($(TARGET),rhel7)
-	OS := rhel7
-	DOCKER_TAG_PUSH ?= "$(OPENLDAP_VERSION)-rhel"
+	IMAGE_TAG := $(OPENLDAP_VERSION)-rhel
 else
-	OS := fedora:34
-	DOCKER_TAG_PUSH ?= "$(OPENLDAP_VERSION)-fedora"
+	IMAGE_TAG := $(OPENLDAP_VERSION)-fedora
 endif
 
+IMAGE := $(IMAGE_PATH):$(IMAGE_TAG)
 
 .PHONY: build
 build:
-	docker build \
-		--build-arg VERSION="$(VERSION)" \
-		--build-arg OS="$(OS)" \
-		-t "$(DOCKER_IMAGE):$(DOCKER_TAG_PUSH)" \
+	$(RUNTIME) build \
+		--build-arg VERSION="$(OPENLDAP_VERSION)" \
+		-t "$(IMAGE)" \
 		-f images/Dockerfile \
 		.
 
 .PHONY: test
 test: build
-	IMAGE_NAME="$(DOCKER_IMAGE):$(DOCKER_TAG_PUSH)" \
+	IMAGE="$(IMAGE)" \
 		hack/test.sh
 
 .PHONY: imagename
 imagename:
-	@echo "$(DOCKER_IMAGE):$(DOCKER_TAG_PUSH)"
+	@echo "$(IMAGE)"

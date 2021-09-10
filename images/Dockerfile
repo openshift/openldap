@@ -1,9 +1,8 @@
-# Current LOWEST version is 2.4.57.
+# Current LOWEST version for Fedora 34 is 2.4.57.
 # Version could be patched by OS.
 ARG VERSION=2.4.57
-ARG OS=fedora:34
 
-FROM "${OS}"
+FROM fedora:34
 
 # OpenLDAP server image for OpenShift Origin
 #

@@ -2,14 +2,14 @@
 #
 # Test the OpenLDAP image.
 #
-# IMAGE_NAME specifies the name of the candidate image used for testing.
+# IMAGE specifies the name of the candidate image used for testing.
 # The image has to be available before this script is executed.
 #
 
 set -eo nounset
 shopt -s nullglob
 
-IMAGE_NAME=${IMAGE_NAME:-openshift/openldap-candidate}
+IMAGE=${IMAGE:-openshift/openldap-candidate}
 
 CIDFILE_DIR=$(mktemp --suffix=openldap_test_cidfiles -d)
 
@@ -88,7 +88,7 @@ function create_container() {
 
   cidfile="$CIDFILE_DIR/$name"
   # create container with a cidfile in a directory for cleanup
-  docker run ${DOCKER_ARGS:-} --cidfile $cidfile -d $IMAGE_NAME ${CONTAINER_ARGS:-}
+  docker run ${DOCKER_ARGS:-} --cidfile $cidfile -d $IMAGE ${CONTAINER_ARGS:-}
 
   echo "Created container $(cat $cidfile)"
 }
