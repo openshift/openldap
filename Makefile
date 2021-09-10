@@ -1,21 +1,32 @@
-SKIP_SQUASH?=0
-VERSIONS="2.4.41"
+OPENLDAP_VERSION := $(shell git describe --tags --always --dirty)
+DOCKER_REGISTRY := dockerhub.com
+DOCKER_IMAGE_NAME := openshift/openldap
+DOCKER_IMAGE := $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME)
+TIMESTAMP_RFC3339 := $(shell date +%Y-%m-%dT%T%z)
 
 ifeq ($(TARGET),rhel7)
 	OS := rhel7
+	DOCKER_TAG_PUSH ?= "$(OPENLDAP_VERSION)-rhel"
 else
-	OS := centos7
+	OS := fedora:34
+	DOCKER_TAG_PUSH ?= "$(OPENLDAP_VERSION)-fedora"
 endif
 
-ifeq ($(VERSION), 2.4.41)
-	VERSION := 2.4.41
-else
-	VERSION :=
-endif
 
 .PHONY: build
 build:
-	SKIP_SQUASH=$(SKIP_SQUASH) VERSIONS=$(VERSIONS) hack/build.sh $(OS) $(VERSION)
+	docker build \
+		--build-arg VERSION="$(VERSION)" \
+		--build-arg OS="$(OS)" \
+		-t "$(DOCKER_IMAGE):$(DOCKER_TAG_PUSH)" \
+		-f images/Dockerfile \
+		.
+
 .PHONY: test
-test:
-	SKIP_SQUASH=$(SKIP_SQUASH) VERSIONS=$(VERSIONS) TAG_ON_SUCCESS=$(TAG_ON_SUCCESS) TEST_MODE=true hack/build.sh $(OS) $(VERSION)
+test: build
+	IMAGE_NAME="$(DOCKER_IMAGE):$(DOCKER_TAG_PUSH)" \
+		hack/test.sh
+
+.PHONY: imagename
+imagename:
+	@echo "$(DOCKER_IMAGE):$(DOCKER_TAG_PUSH)"
