@@ -92,15 +92,20 @@ function run_tests() {
   local name=$1
   local port=$2
 
+  echo "#######################################"
+  echo "# Test Case: $name"
+  echo "#######################################"
+
   create_container $name $port
   test_connection $name $port
   test_openldap $port
 
   echo "  Test Success!"
+  echo "#######################################"
 }
 
 trap cleanup EXIT SIGINT
 
 # Tests.
 run_tests test_container_root 8489
-DOCKER_ARGS="-u 12345" run_tests test_container_root 8389
+DOCKER_ARGS="-u 12345" run_tests test_container_non_root 8389
