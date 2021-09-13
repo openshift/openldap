@@ -1,9 +1,9 @@
 OPENLDAP_VERSION := $(shell git describe --tags --always --dirty)
 
 RUNTIME ?= podman
-CONTAINER_REGISTRY := dockerhub.com/
+CONTAINER_REGISTRY := dockerhub.com
 IMAGE_NAME := openshift/openldap
-IMAGE_PATH := $(CONTAINER_REGISTRY)$(IMAGE_NAME)
+IMAGE_PATH := $(CONTAINER_REGISTRY)/$(IMAGE_NAME)
 
 ifeq ($(TARGET),rhel7)
 	IMAGE_TAG := $(OPENLDAP_VERSION)-rhel
@@ -24,6 +24,7 @@ build:
 .PHONY: test
 test: build
 	IMAGE="$(IMAGE)" \
+	RUNTIME="$(RUNTIME)" \
 		hack/test.sh
 
 .PHONY: imagename
