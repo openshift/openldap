@@ -11,7 +11,6 @@ shopt -s nullglob
 
 IMAGE=${IMAGE:-openshift/openldap-candidate}
 RUNTIME=${RUNTIME:-podman}
-PORT=
 
 CIDFILE_DIR=$(mktemp --suffix=openldap_test_cidfiles -d)
 
@@ -37,7 +36,7 @@ function cleanup() {
 function get_cid() {
   local id="$1" ; shift || return 1
 
-  echo $(cat "$CIDFILE_DIR/$id")
+  cat "$CIDFILE_DIR/$id"
 }
 
 function test_connection() {
@@ -47,7 +46,7 @@ function test_connection() {
 
   local max_attempts=20
   local sleep_time=2
-  for i in $(seq $max_attempts); do
+  for _ in $(seq $max_attempts); do
     echo "    Trying to connect..."
     set +e
     ldapsearch -x -h localhost -p $port -b dc=example,dc=com objectClass=*
@@ -60,7 +59,7 @@ function test_connection() {
     sleep $sleep_time
   done
   echo "  Giving up: Failed to connect. Logs:"
-  $RUNTIME logs $(get_cid $name)
+  $RUNTIME logs "$(get_cid $name)"
 
   return 1
 }
