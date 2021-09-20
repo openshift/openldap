@@ -1,7 +1,3 @@
-# Current LOWEST version for Fedora 34 is 2.4.57.
-# Version could be patched by OS.
-ARG VERSION=2.4.57
-
 FROM fedora:34
 
 # OpenLDAP server image for OpenShift Origin
@@ -14,11 +10,9 @@ FROM fedora:34
 # * $OPENLDAP_DEBUG_LEVEL (Optional) - OpenLDAP debugging level, defaults to 256
 
 LABEL io.k8s.description="OpenLDAP is an open source implementation of the Lightweight Directory Access Protocol." \
-      io.k8s.display-name="OpenLDAP ${VERSION}" \
       io.openshift.expose-services="389:ldap,636:ldaps" \
       io.openshift.tags="directory,ldap,openldap" \
-      io.openshift.non-scalable="true" \
-      io.openshift.maintainer="Krzysztof Ostrowski <kostrows@redhat.com>"
+      io.openshift.non-scalable="true"
 
 # Add defaults for config
 COPY ./contrib/config /opt/openshift/config
