@@ -2,7 +2,7 @@
 #
 # Test the OpenLDAP image.
 #
-# IMAGE specifies the name of the candidate image used for testing.
+# IMAGE specifies the test_name of the candidate image used for testing.
 # The image has to be available before this script is executed.
 #
 
@@ -12,99 +12,125 @@ shopt -s nullglob
 IMAGE=${IMAGE:-openshift/openldap-candidate}
 RUNTIME=${RUNTIME:-podman}
 
-CIDFILE_DIR=$(mktemp --suffix=openldap_test_cidfiles -d)
-
 function cleanup() {
-  for cidfile in $CIDFILE_DIR/* ; do
-    CONTAINER=$(cat $cidfile)
-    echo "Stopping and removing container $CONTAINER..."
+  local network_name=$1
+  local container_names="$2 $3"
 
-    $RUNTIME stop $CONTAINER
-    exit_status=$($RUNTIME inspect -f '{{.State.ExitCode}}' $CONTAINER)
+  $RUNTIME network rm -f "$network_name"
+
+  for container in $container_names
+  do
+    echo "Stopping and removing container $container..."
+
+    $RUNTIME stop "$container"
+    exit_status=$($RUNTIME inspect -f '{{.State.ExitCode}}' "$container")
     if [ "$exit_status" != "0" ]; then
-      echo "Dumping logs for $CONTAINER"
-      $RUNTIME logs $CONTAINER
+      echo "Dumping logs for $container"
+      $RUNTIME logs "$container"
     fi
-    $RUNTIME rm $CONTAINER
-    rm $cidfile
+
+    $RUNTIME rm "$container"
     echo "Done."
+
   done
-
-  rmdir $CIDFILE_DIR
-}
-
-function get_cid() {
-  local id="$1" ; shift || return 1
-
-  cat "$CIDFILE_DIR/$id"
 }
 
 function test_connection() {
-  local name=$1
-  local port=$2
-  echo "  Testing OpenLDAP connection to localhost:$port..."
-
+  local client_name=$1
+  local server_name=$2
   local max_attempts=20
   local sleep_time=2
+
+  echo "  Testing OpenLDAP connection to $server_name..."
+
   for _ in $(seq $max_attempts); do
     echo "    Trying to connect..."
+
     set +e
-    ldapsearch -x -h localhost -p $port -b dc=example,dc=com objectClass=*
+    $RUNTIME container exec "$client_name" \
+      ldapsearch -x \
+        -h "$server_name" -p 389 \
+        -b dc=example,dc=com objectClass="*"
     status=$?
     set -e
+
     if [ $status -eq 0 ]; then
       echo "  Success!"
       return 0
     fi
+
     sleep $sleep_time
   done
+
   echo "  Giving up: Failed to connect. Logs:"
-  $RUNTIME logs "$(get_cid $name)"
+  $RUNTIME logs "$client_name"
 
   return 1
 }
 
 function test_openldap() {
-  local port=$1
+  local client_name=$1
+  local server_name=$2
   echo "  Testing OpenLDAP"
 
-  ldapsearch -x -LLL -h localhost -p $port -b dc=example,dc=com objectClass=organization | grep "dc=example,dc=com"
-  ldapadd -x -h localhost -p $port -D cn=Manager,dc=example,dc=com -w admin -f test/test.ldif
-  ldapsearch -x -LLL -h localhost -p $port -b cn=person,dc=example,dc=com memberof | grep "dc=example,dc=com"
+  $RUNTIME container exec "$client_name" \
+    ldapsearch -x -LLL \
+      -h "$server_name" -p 389 \
+      -b dc=example,dc=com objectClass=organization \
+      | grep "dc=example,dc=com"
+
+  $RUNTIME container exec "$client_name" \
+    ldapadd -x \
+      -h "$server_name" -p 389 \
+      -D cn=Manager,dc=example,dc=com -w admin \
+      -f test/test.ldif
+
+  $RUNTIME container exec "$client_name" \
+    ldapsearch -x -LLL \
+      -h "$server_name" -p 389 \
+      -b cn=person,dc=example,dc=com memberof \
+      | grep "dc=example,dc=com"
 
   echo "  Success!"
 }
 
 function create_container() {
-  local name=$1
-  local port=$2
+  local container_name=$1
+  local docker_args=$2
 
-  cidfile="$CIDFILE_DIR/$name"
-  # create container with a cidfile in a directory for cleanup
-  $RUNTIME run ${DOCKER_ARGS:-} -p $port:389 --cidfile $cidfile -d $IMAGE ${CONTAINER_ARGS:-}
+  $RUNTIME run $docker_args --name "$container_name" -d "$IMAGE"
 
-  echo "Created container $(cat $cidfile)"
+  echo "Created container $container_name"
 }
 
-
 function run_tests() {
-  local name=$1
-  local port=$2
+  local test_name=$1
+  local additional_args=$2
+  local timestamp=$(date '+%s')
+  local client_name="ldap_client_$timestamp"
+  local server_name="ldap_server_$timestamp"
+  local network_name="ldap_net_$timestamp"
+
+  trap 'cleanup $client_name $server_name' SIGINT
 
   echo "#######################################"
-  echo "# Test Case: $name"
+  echo "# Test Case: $test_name"
   echo "#######################################"
 
-  create_container $name $port
-  test_connection $name $port
-  test_openldap $port
+  $RUNTIME network create -d bridge "$network_name"
+
+  create_container "$client_name" "--network $network_name $additional_args"
+  create_container "$server_name" "--network $network_name $additional_args"
+
+  test_connection "$client_name" "$server_name"
+  test_openldap "$client_name" "$server_name"
 
   echo "  Test Success!"
   echo "#######################################"
+
+  cleanup "$client_name" "$server_name"
 }
 
-trap cleanup EXIT SIGINT
-
 # Tests.
-run_tests test_container_root 8489
-DOCKER_ARGS="-u 12345" run_tests test_container_non_root 8389
+run_tests "root" " "
+run_tests "rootless" "-u 12345"
