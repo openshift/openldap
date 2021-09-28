@@ -24,6 +24,9 @@ COPY ./contrib/*.ldif /usr/local/etc/openldap/
 COPY ./contrib/*.schema /usr/local/etc/openldap/
 COPY ./contrib/DB_CONFIG /usr/local/etc/openldap/
 
+# Add test query
+COPY test/test.ldif /test/test.ldif
+
 # Install OpenLDAP Server, give it permissionst to bind to low ports
 RUN yum install -y \
         openldap \

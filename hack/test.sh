@@ -16,8 +16,6 @@ function cleanup() {
   local network_name=$1
   local container_names="$2 $3"
 
-  $RUNTIME network rm -f "$network_name"
-
   for container in $container_names
   do
     echo "Stopping and removing container $container..."
@@ -33,6 +31,10 @@ function cleanup() {
     echo "Done."
 
   done
+
+  echo "Remove network $network_name"
+  $RUNTIME network rm -f "$network_name"
+
 }
 
 function test_connection() {
@@ -111,7 +113,7 @@ function run_tests() {
   local server_name="ldap_server_$timestamp"
   local network_name="ldap_net_$timestamp"
 
-  trap 'cleanup $client_name $server_name' SIGINT
+  trap 'cleanup $network_name $client_name $server_name' SIGINT
 
   echo "#######################################"
   echo "# Test Case: $test_name"
@@ -128,7 +130,7 @@ function run_tests() {
   echo "  Test Success!"
   echo "#######################################"
 
-  cleanup "$client_name" "$server_name"
+  cleanup "$network_name" "$client_name" "$server_name"
 }
 
 # Tests.
