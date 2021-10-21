@@ -5,9 +5,6 @@ objectClass: olcGlobal
 cn: config
 olcArgsFile: /var/run/openldap/slapd.args
 olcPidFile: /var/run/openldap/slapd.pid
-olcTLSCACertificatePath: /etc/openldap/certs
-olcTLSCertificateFile: "OpenLDAP Server"
-olcTLSCertificateKeyFile: /etc/openldap/certs/password
 structuralObjectClass: olcGlobal
 entryUUID: 1752bf5a-022c-1035-8b1b-150b514cd1c2
 creatorsName: cn=config

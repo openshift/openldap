@@ -1,0 +1,21 @@
+# The base LDIF data
+dn: OPENLDAP_SUFFIX
+objectClass: top
+objectClass: dcObject
+objectclass: organization
+dc: FIRST_PART
+o: FIRST_PART
+
+dn: cn=Manager,OPENLDAP_SUFFIX
+objectClass: organizationalRole
+cn: Manager
+description: LDAP Directory Manager
+
+dn: ou=People,OPENLDAP_SUFFIX
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Group,OPENLDAP_SUFFIX
+objectClass: organizationalUnit
+ou: Group
+

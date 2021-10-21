@@ -3,7 +3,7 @@ changetype: modify
 replace: olcRootPW
 olcRootPW: OPENLDAP_ROOT_PASSWORD
 
-dn: olcDatabase={2}hdb,cn=config
+dn: olcDatabase={2}mdb,cn=config
 changetype: modify
 replace: olcRootPW
 olcRootPW: OPENLDAP_ROOT_PASSWORD
@@ -13,3 +13,4 @@ olcRootDN: OPENLDAP_ROOT_DN,OPENLDAP_SUFFIX
 -
 replace: olcSuffix
 olcSuffix: OPENLDAP_SUFFIX
+

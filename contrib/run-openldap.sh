@@ -9,7 +9,6 @@ OPENLDAP_ROOT_PASSWORD=${OPENLDAP_ROOT_PASSWORD:-admin}
 OPENLDAP_ROOT_DN_PREFIX=${OPENLDAP_ROOT_DN_PREFIX:-'cn=Manager'}
 OPENLDAP_ROOT_DN_SUFFIX=${OPENLDAP_ROOT_DN_SUFFIX:-'dc=example,dc=com'}
 OPENLDAP_DEBUG_LEVEL=${OPENLDAP_DEBUG_LEVEL:-256}
-OPENLDAP_LISTEN_URIS=${OPENLDAP_LISTEN_URIS:-"ldaps:/// ldap:///"}
 
 # Only run if no config has happened fully before
 if [ ! -f /etc/openldap/CONFIGURED ]; then
@@ -22,10 +21,10 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
         cp /usr/local/etc/openldap/DB_CONFIG /var/lib/ldap/DB_CONFIG
 
         # start the daemon in another process and make config changes
-        slapd -h "ldapi:///" -d $OPENLDAP_DEBUG_LEVEL &
+        slapd -h "ldap:/// ldaps:/// ldapi:///" -d $OPENLDAP_DEBUG_LEVEL &
         for ((i=30; i>0; i--))
         do
-            ping_result=`ldapsearch -Y EXTERNAL -H ldapi:/// 2>&1 | grep "Can.t contact LDAP server"`
+            ping_result=`ldapsearch 2>&1 | grep "Can.t contact LDAP server"`
             if [ -z "$ping_result" ]
             then
                 break
@@ -69,9 +68,7 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
         sed -e "s OPENLDAP_SUFFIX ${OPENLDAP_ROOT_DN_SUFFIX} g" \
             -e "s FIRST_PART ${dc_name} g" \
             usr/local/etc/openldap/base.ldif |
-            ldapadd -H ldapi:/// -x \
-	    	-D "$OPENLDAP_ROOT_DN_PREFIX,$OPENLDAP_ROOT_DN_SUFFIX" \
-		-w "$OPENLDAP_ROOT_PASSWORD"
+            ldapadd -x -D "$OPENLDAP_ROOT_DN_PREFIX,$OPENLDAP_ROOT_DN_SUFFIX" -w "$OPENLDAP_ROOT_PASSWORD"
 
         # stop the daemon
         pid=$(ps -A | grep slapd | awk '{print $1}')
@@ -123,4 +120,4 @@ if [ ! -f /etc/openldap/CONFIGURED ]; then
 fi
 
 # Start the slapd service
-exec slapd -h "${OPENLDAP_LISTEN_URIS}" -d $OPENLDAP_DEBUG_LEVEL
+exec slapd -h "ldap:/// ldaps:///" -d $OPENLDAP_DEBUG_LEVEL

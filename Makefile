@@ -1,21 +1,31 @@
-SKIP_SQUASH?=0
-VERSIONS="2.4.41"
+RUNTIME ?= podman
+CONTAINER_REGISTRY := dockerhub.com
+IMAGE_NAME := openshift/openldap
+IMAGE_PATH := $(CONTAINER_REGISTRY)/$(IMAGE_NAME)
 
 ifeq ($(TARGET),rhel7)
-	OS := rhel7
+	IMAGE_TAG := rhel7
+	IMAGE_FILE := images/Dockerfile.rhel7
 else
-	OS := centos7
+	IMAGE_TAG := fedora34
+	IMAGE_FILE := images/Dockerfile
 endif
 
-ifeq ($(VERSION), 2.4.41)
-	VERSION := 2.4.41
-else
-	VERSION :=
-endif
+IMAGE := $(IMAGE_PATH):$(IMAGE_TAG)
 
 .PHONY: build
 build:
-	SKIP_SQUASH=$(SKIP_SQUASH) VERSIONS=$(VERSIONS) hack/build.sh $(OS) $(VERSION)
+	$(RUNTIME) build \
+		-t "$(IMAGE)" \
+		-f "$(IMAGE_FILE)" \
+		.
+
 .PHONY: test
-test:
-	SKIP_SQUASH=$(SKIP_SQUASH) VERSIONS=$(VERSIONS) TAG_ON_SUCCESS=$(TAG_ON_SUCCESS) TEST_MODE=true hack/build.sh $(OS) $(VERSION)
+test: build
+	IMAGE="$(IMAGE)" \
+	RUNTIME="$(RUNTIME)" \
+		hack/test.sh
+
+.PHONY: image_name
+image_name:
+	@echo "$(IMAGE)"
