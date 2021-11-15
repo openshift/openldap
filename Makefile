@@ -1,6 +1,6 @@
 RUNTIME ?= podman
-CONTAINER_REGISTRY := dockerhub.com
-IMAGE_NAME := openshift/openldap
+CONTAINER_REGISTRY := quay.io
+IMAGE_NAME := openshift-auth/openldap
 IMAGE_PATH := $(CONTAINER_REGISTRY)/$(IMAGE_NAME)
 
 ifeq ($(TARGET),rhel7)
