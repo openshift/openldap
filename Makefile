@@ -26,6 +26,11 @@ test: build
 	RUNTIME="$(RUNTIME)" \
 		hack/test.sh
 
+.PHONY: push
+push: build
+	RUNTIME="$(RUNTIME)" push \
+		$(IMAGE)
+
 .PHONY: image_name
 image_name:
 	@echo "$(IMAGE)"
