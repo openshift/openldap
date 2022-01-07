@@ -21,10 +21,8 @@ build:
 		.
 
 .PHONY: test
-test: build
-	IMAGE="$(IMAGE)" \
-	RUNTIME="$(RUNTIME)" \
-		hack/test.sh
+test:
+	echo 'hello world!'
 
 .PHONY: image_name
 image_name:
