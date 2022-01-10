@@ -29,6 +29,7 @@ COPY test/test.ldif /test/test.ldif
 
 # Install OpenLDAP Server, give it permissionst to bind to low ports
 RUN yum install -y \
+        git \
         openldap \
         openldap-servers \
         openldap-clients \

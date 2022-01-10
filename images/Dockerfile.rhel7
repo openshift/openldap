@@ -24,7 +24,7 @@ COPY contrib/*.schema /usr/local/etc/openldap/
 COPY contrib/DB_CONFIG /usr/local/etc/openldap/
 
 # Install OpenLDAP Server, give it permissionst to bind to low ports
-RUN yum install -y openssl openldap openldap-servers openldap-clients procps-ng && \
+RUN yum install -y git openssl openldap openldap-servers openldap-clients procps-ng && \
     yum clean all -y && \
     setcap 'cap_net_bind_service=+ep' /usr/sbin/slapd && \
     mkdir -p /var/lib/ldap && \
