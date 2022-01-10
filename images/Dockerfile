@@ -28,14 +28,14 @@ COPY ./contrib/DB_CONFIG /usr/local/etc/openldap/
 COPY test/test.ldif /test/test.ldif
 
 # Install OpenLDAP Server, give it permissionst to bind to low ports
-RUN yum install -y \
+RUN dnf install -y \
         git \
         openldap \
         openldap-servers \
         openldap-clients \
         openssl \
         procps-ng && \
-    yum clean all -y && \
+    dnf clean all -y && \
     setcap 'cap_net_bind_service=+ep' /usr/sbin/slapd && \
     mkdir -p /var/lib/ldap && \
     chmod a+rwx -R /var/lib/ldap && \
