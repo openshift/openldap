@@ -29,7 +29,7 @@ COPY test/test.ldif /test/test.ldif
 
 # Install OpenLDAP Server, give it permissionst to bind to low ports
 RUN dnf install -y \
-        git \
+        git find xargs\
         openldap \
         openldap-servers \
         openldap-clients \
