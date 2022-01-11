@@ -7,7 +7,7 @@ ifeq ($(TARGET),rhel7)
 	IMAGE_TAG := rhel7
 	IMAGE_FILE := images/Dockerfile.rhel7
 else
-	IMAGE_TAG := fedora34
+	IMAGE_TAG := fedora35
 	IMAGE_FILE := images/Dockerfile
 endif
 
