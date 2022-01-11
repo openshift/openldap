@@ -29,7 +29,7 @@ COPY test/test.ldif /test/test.ldif
 
 # Install OpenLDAP Server, give it permissionst to bind to low ports
 RUN dnf install -y \
-        git find xargs\
+        git findutils \
         openldap \
         openldap-servers \
         openldap-clients \
@@ -43,7 +43,7 @@ RUN dnf install -y \
     chmod a+rwx -R /etc/openldap && \
     mkdir -p /var/run/openldap && \
     chmod a+rwx -R /var/run/openldap && \
-    chmod -R a+rw /opt/openshift 
+    chmod -R a+rw /opt/openshift
 
 # Set OpenLDAP data and config directories in a data volume
 VOLUME ["/var/lib/ldap", "/etc/openldap"]
